@@ -19,6 +19,7 @@
 ![Django](https://img.shields.io/badge/django-black.svg?style=for-the-badge&logo=django&logoColor=3CB371)
 ![DRF](https://img.shields.io/badge/DRF-black?style=for-the-badge&logo=django&logoColor=red)
 ![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=vlue)
+![aiohttp](https://img.shields.io/badge/aiohttp-black?style=for-the-badge&logo=aiohttp&logoColor=blue)
 ![pytest](https://img.shields.io/badge/pytest-black.svg?style=for-the-badge&logo=pytest&logoColor=white)
 ![unittest](https://img.shields.io/badge/unittest-black.svg?style=for-the-badge&logo=labex&logoColor=6A5ACD)
 ![Flake8](https://img.shields.io/badge/Flake8-black.svg?style=for-the-badge&logo=python&logoColor=blue)
@@ -32,6 +33,7 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-black?style=for-the-badge&logo=postgresql&logoColor=4169E1)
 ![SQL](https://img.shields.io/badge/SQL-black.svg?style=for-the-badge&logo=sqlite&logoColor=87CEEB)
 ![SQLite](https://img.shields.io/badge/SQLite-black?style=for-the-badge&logo=sqlite&logoColor=white)
+![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-black?style=for-the-badge&logo=sqlalchemy&logoColor=D71F00)
 
 ![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
 ![Swagger](https://img.shields.io/badge/Swagger-black?style=for-the-badge&logo=swagger&logoColor=85EA2D)
