@@ -18,6 +18,7 @@
 ![Python](https://img.shields.io/badge/python-black?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![Django](https://img.shields.io/badge/django-black.svg?style=for-the-badge&logo=django&logoColor=3CB371)
 ![DRF](https://img.shields.io/badge/DRF-black?style=for-the-badge&logo=django&logoColor=red)
+![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=vlue)
 ![pytest](https://img.shields.io/badge/pytest-black.svg?style=for-the-badge&logo=pytest&logoColor=white)
 ![unittest](https://img.shields.io/badge/unittest-black.svg?style=for-the-badge&logo=labex&logoColor=6A5ACD)
 ![Flake8](https://img.shields.io/badge/Flake8-black.svg?style=for-the-badge&logo=python&logoColor=blue)
