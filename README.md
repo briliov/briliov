@@ -46,14 +46,14 @@
 ![Git](https://img.shields.io/badge/git-black.svg?style=for-the-badge&logo=git&logoColor=orange)
 
 ---
-
+<!-- 
 ### ✦ PROGRESS & SKILLS
 
 ![Commits card](http://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=Briliov&theme=dark)
 ![Top laguage by repo](http://github-profile-summary-cards.vercel.app/api/cards/repos-per-language?username=Briliov&theme=dark)
 ![Top laguage by commit](http://github-profile-summary-cards.vercel.app/api/cards/most-commit-language?username=Briliov&theme=dark)
 ![Top stats](http://github-profile-summary-cards.vercel.app/api/cards/stats?username=Briliov&theme=dark)
-![Commits info](http://github-profile-summary-cards.vercel.app/api/cards/productive-time?username=Briliov&theme=dark&utcOffset=8)
+![Commits info](http://github-profile-summary-cards.vercel.app/api/cards/productive-time?username=Briliov&theme=dark&utcOffset=8) -->
 
 <!-- #### Educational platforms & Roadmaps
 
