@@ -1,18 +1,4 @@
-<svg width="500" height="150" viewBox="0 0 500 150" xmlns="http://w3.org">
-  <g font-family="'Courier New', Consolas, Monaco, monospace" font-size="14" font-weight="bold">
-    <text x="0" y="16" xml:space="preserve"><tspan> </tspan><tspan fill="#ff0000">▄▄▄▄    ██</tspan><tspan fill="#ff0000">▀███    ██▓  </tspan><tspan fill="#ff5f00">██▓     █</tspan><tspan fill="#ffaf00">█▓ ▒█████   </tspan><tspan fill="#ffd700">██▒   █▓</tspan></text>
-    <text x="0" y="32" xml:space="preserve"><tspan fill="#ff0000">▓█████▄ ▓██ </tspan><tspan fill="#ff0000">▒ ██▒▒▓██▒ </tspan><tspan fill="#ff5f00">▓██▒   ▒▓█</tspan><tspan fill="#ffaf00">█▒▒██▒  ██▒</tspan><tspan fill="#ffd700">▓██░   █▒</tspan></text>
-    <text x="0" y="48" xml:space="preserve"><tspan fill="#ff0000">▒██▒ ▄██▓██ </tspan><tspan fill="#ff0000">░▄█ ▒▒▒██▒ </tspan><tspan fill="#ff5f00">▒██░   ▒▒█</tspan><tspan fill="#ffaf00">█▒▒██░  ██▒ </tspan><tspan fill="#ffd700">▓██  █▒░</tspan></text>
-    <text x="0" y="64" xml:space="preserve"><tspan fill="#ff0000">▒██░█▀  ▒██</tspan><tspan fill="#ff5f00">▀▀█▄  ░░██░ </tspan><tspan fill="#ff8700">▒██░   ░░█</tspan><tspan fill="#ffaf00">█░▒██   ██░  </tspan><tspan fill="#ffd700">▒██ █░░</tspan></text>
-    <text x="0" y="80" xml:space="preserve"><tspan fill="#ff0000">░▓█  ▀█▓░██</tspan><tspan fill="#ff5f00">▓ ▒██▒░░██░</tspan><tspan fill="#ff8700">▒░██████░░█</tspan><tspan fill="#ffaf00">█░░ ████▓▒░   </tspan><tspan fill="#ffd700">▒▀█░  </tspan></text>
-    <text x="0" y="96" xml:space="preserve"><tspan fill="#ff0000">░▒▓███▀▒░ ▒</tspan><tspan fill="#ff5f00">▓ ░▒▓░ ░▓  </tspan><tspan fill="#ff8700">░░ ▒░▓   ░▓  </tspan><tspan fill="#ffaf00">░ ▒░▒░▒░    </tspan><tspan fill="#ffd700">░ ▐░  </tspan></text>
-    <text x="0" y="112" xml:space="preserve"><tspan fill="#ff0000">▒░▒   ░   ░</tspan><tspan fill="#ff5f00">▒ ░ ▒ ░ ▒ ░</tspan><tspan fill="#ff8700">░░ ░ ▒  ░ ▒ </tspan><tspan fill="#ffd700">░  ░ ▒ ▒░    </tspan><tspan fill="#ffd700">░ ░░  </tspan></text>
-    <text x="0" y="128" xml:space="preserve"><tspan> </tspan><tspan fill="#ff0000">░    ░   ░</tspan><tspan fill="#ff5f00">░   ░ ░ ▒ ░   </tspan><tspan fill="#ff8700">░ ░  ░ ▒ </tspan><tspan fill="#ffd700">░░ ░ ░ ▒        </tspan><tspan fill="#ffd700">░  </tspan></text>
-    <text x="0" y="144" xml:space="preserve"><tspan> </tspan><tspan fill="#ff0000">░</tspan></text>
-  </g>
-</svg>
-
-<!-- ### ✦ ABOUT ME -->
+![BRILIOV](src/banner.svg)
 
 ## Hi there, my name is [Egor](https://github.com/briliov) ✦
 **STATUS:** \
