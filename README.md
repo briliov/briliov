@@ -41,12 +41,12 @@
 ![Docker](https://img.shields.io/badge/Docker-black?style=for-the-badge&logo=Docker&logoColor=2496ED)
 ![GitHub Actions](https://img.shields.io/badge/GITHUB_ACTIONS-black?style=for-the-badge&logo=GITHUB&logoColor=white)
 
+![Ruff](https://img.shields.io/badge/Ruff-black.svg?style=for-the-badge&logo=Ruff&logoColor=#D7FF64)
 ![Markdown](https://img.shields.io/badge/markdown-%23000000.svg?style=for-the-badge&logo=markdown&logoColor=white)
 ![PowerShell](https://img.shields.io/badge/PowerShell-black.svg?style=for-the-badge&logo=gnometerminal&logoColor=1E90FF)
-![Git](https://img.shields.io/badge/git-black.svg?style=for-the-badge&logo=git&logoColor=orange)
-
 ![Zsh](https://img.shields.io/badge/Zsh-black.svg?style=for-the-badge&logo=Zsh&logoColor=#F15A24)
-![Ruff](https://img.shields.io/badge/Ruff-black.svg?style=for-the-badge&logo=Ruff&logoColor=#D7FF64)
+![GNU Bash](https://img.shields.io/badge/BASH-black.svg?style=for-the-badge&logo=gnubash&logoColor=#4EAA25)
+![Git](https://img.shields.io/badge/git-black.svg?style=for-the-badge&logo=git&logoColor=orange)
 ![GitHub Actions](https://img.shields.io/badge/githubactions-black.svg?style=for-the-badge&logo=githubactions&logoColor=#2088FF)
 
 ---
