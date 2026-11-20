@@ -45,6 +45,10 @@
 ![PowerShell](https://img.shields.io/badge/PowerShell-black.svg?style=for-the-badge&logo=gnometerminal&logoColor=1E90FF)
 ![Git](https://img.shields.io/badge/git-black.svg?style=for-the-badge&logo=git&logoColor=orange)
 
+![Zsh](https://img.shields.io/badge/Zsh-black.svg?style=for-the-badge&logo=Zsh&logoColor=#F15A24)
+![Ruff](https://img.shields.io/badge/Ruff-black.svg?style=for-the-badge&logo=Ruff&logoColor=#D7FF64)
+![GitHub Actions](https://img.shields.io/badge/githubactions-black.svg?style=for-the-badge&logo=githubactions&logoColor=#2088FF)
+
 ---
 <!-- 
 ### ✦ PROGRESS & SKILLS
