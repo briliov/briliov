@@ -47,7 +47,6 @@
 ![Zsh](https://img.shields.io/badge/Zsh-black.svg?style=for-the-badge&logo=Zsh&logoColor=#F15A24)
 ![GNU Bash](https://img.shields.io/badge/BASH-black.svg?style=for-the-badge&logo=gnubash&logoColor=#4EAA25)
 ![Git](https://img.shields.io/badge/git-black.svg?style=for-the-badge&logo=git&logoColor=orange)
-![GitHub Actions](https://img.shields.io/badge/githubactions-black.svg?style=for-the-badge&logo=githubactions&logoColor=#2088FF)
 
 ---
 <!-- 
