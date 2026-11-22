@@ -5,29 +5,16 @@ import shutil
 import urllib.parse
 
 from profile_sync.config import BADGES_DIR, GITHUB_WEB_URL
-from profile_sync.github_client import (
-    collect_topics_map,
-    fetch_devicon_colors,
-    get_username,
-)
+from profile_sync.github_client import collect_topics_map, fetch_devicon_colors, get_username
 from profile_sync.icon_providers import resolve_icon_info
 from profile_sync.reporter import print_console_report, update_readme
 from profile_sync.svg_builder import create_svg_badge
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(message)s',
-    datefmt='%H:%M:%S',
-)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s', datefmt='%H:%M:%S')
 logger = logging.getLogger(__name__)
 
 
-def process_badges(
-    topic_repos: dict[str, list[str]],
-    username: str,
-    brand_colors: dict[str, str],
-) -> str:
-    """Rebuild SVG badges, print console audit tables, and return README HTML."""
+def process_badges(topic_repos: dict[str, list[str]], username: str, brand_colors: dict[str, str]) -> str:
     if BADGES_DIR.exists():
         shutil.rmtree(BADGES_DIR)
         logger.info('Cleaned badges directory: %s', BADGES_DIR)
@@ -42,38 +29,21 @@ def process_badges(
         if not icon_info:
             missing_icons[topic] = repos
             continue
-
         provider, icon_data, source_file, applied_color = icon_info
         create_svg_badge(topic, icon_data)
-
         matched_records.append(
-            {
-                'topic': topic,
-                'provider': provider,
-                'source': source_file,
-                'color': applied_color,
-                'count': len(repos),
-            }
+            {'topic': topic, 'provider': provider, 'source': source_file, 'color': applied_color, 'count': len(repos)}
         )
-
         label = topic.upper().replace('-', ' ')
         rel_path = f'assets/badges/{topic}.svg'
-        filter_url = (
-            f'{GITHUB_WEB_URL}/{username}?tab=repositories'
-            f'&topic={urllib.parse.quote(topic)}'
-        )
-        html_lines.append(
-            f'  <a href="{filter_url}">'
-            f'<img src="{rel_path}" alt="{label}" vspace="3" hspace="2" />'
-            f'</a>'
-        )
+        filter_url = f'{GITHUB_WEB_URL}/{username}?tab=repositories&topic={urllib.parse.quote(topic)}'
+        html_lines.append(f'  <a href="{filter_url}"><img src="{rel_path}" alt="{label}" vspace="3" hspace="2" /></a>')
 
     print_console_report(username, matched_records, missing_icons)
     return '\n'.join(html_lines)
 
 
 def main() -> None:
-    """Collect repository topics, rebuild SVG badges, and update README."""
     username = get_username()
     brand_colors = fetch_devicon_colors()
     topic_repos = collect_topics_map(username)
