@@ -6,7 +6,12 @@ import logging
 import os
 import urllib.request
 
-from profile_sync.config import DEVICON_META_URL, GITHUB_API_URL, REPO_ROOT, TOKEN
+from profile_sync.config import (
+    DEVICON_META_URL,
+    GITHUB_API_URL,
+    REPO_ROOT,
+    TOKEN,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +22,10 @@ def get_username() -> str:
 
 
 def github_get(url: str) -> list | dict:
-    headers = {'Accept': 'application/vnd.github+json', 'User-Agent': 'Profile-Stack-Sync'}
+    headers = {
+        'Accept': 'application/vnd.github+json',
+        'User-Agent': 'Profile-Stack-Sync',
+    }
     if TOKEN:
         headers['Authorization'] = f'Bearer {TOKEN}'
     req = urllib.request.Request(url, headers=headers)
@@ -61,6 +69,8 @@ def collect_topics_map(username: str) -> dict[str, list[str]]:
                 continue
             for topic in repo.get('topics', []):
                 topic_repos[topic].append(repo_name)
-    sorted_items = sorted(topic_repos.items(), key=lambda item: (-len(item), item))
+    sorted_items = sorted(
+        topic_repos.items(), key=lambda item: (-len(item), item)
+    )
     logger.info('Collected %d unique topics.', len(sorted_items))
     return dict(sorted_items)
