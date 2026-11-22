@@ -62,3 +62,29 @@
 
 [![roadmap.sh](https://roadmap.sh/card/wide/669e52f49a21cb3c68b6cb08?variant=dark&roadmaps=)](https://roadmap.sh)
 ![CodeWars Stats](https://www.codewars.com/users/briliov/badges/large) -->
+
+# Test
+
+<p align="left">
+<!-- TECH_STACK:START -->
+  <a href="https://github.com/briliov?tab=repositories&topic=python" title="python"><img src="https://raw.githubusercontent.com/github/explore/main/topics/python/python.png" alt="python" width="36" height="36" /></a>
+  <a href="https://github.com/briliov?tab=repositories&topic=django" title="django"><img src="https://raw.githubusercontent.com/github/explore/main/topics/django/django.png" alt="django" width="36" height="36" /></a>
+  <a href="https://github.com/briliov?tab=repositories&topic=postman" title="postman"><img src="https://raw.githubusercontent.com/github/explore/main/topics/postman/postman.png" alt="postman" width="36" height="36" /></a>
+  <a href="https://github.com/briliov?tab=repositories&topic=git" title="git"><img src="https://raw.githubusercontent.com/github/explore/main/topics/git/git.png" alt="git" width="36" height="36" /></a>
+  <a href="https://github.com/briliov?tab=repositories&topic=bootstrap" title="bootstrap"><img src="https://raw.githubusercontent.com/github/explore/main/topics/bootstrap/bootstrap.png" alt="bootstrap" width="36" height="36" /></a>
+  <a href="https://github.com/briliov?tab=repositories&topic=cli" title="cli"><img src="https://raw.githubusercontent.com/github/explore/main/topics/cli/cli.png" alt="cli" width="36" height="36" /></a>
+  <a href="https://github.com/briliov?tab=repositories&topic=css" title="css"><img src="https://raw.githubusercontent.com/github/explore/main/topics/css/css.png" alt="css" width="36" height="36" /></a>
+  <a href="https://github.com/briliov?tab=repositories&topic=sqlite" title="sqlite"><img src="https://raw.githubusercontent.com/github/explore/main/topics/sqlite/sqlite.png" alt="sqlite" width="36" height="36" /></a>
+  <a href="https://github.com/briliov?tab=repositories&topic=docker" title="docker"><img src="https://raw.githubusercontent.com/github/explore/main/topics/docker/docker.png" alt="docker" width="36" height="36" /></a>
+  <a href="https://github.com/briliov?tab=repositories&topic=flask" title="flask"><img src="https://raw.githubusercontent.com/github/explore/main/topics/flask/flask.png" alt="flask" width="36" height="36" /></a>
+  <a href="https://github.com/briliov?tab=repositories&topic=html" title="html"><img src="https://raw.githubusercontent.com/github/explore/main/topics/html/html.png" alt="html" width="36" height="36" /></a>
+  <a href="https://github.com/briliov?tab=repositories&topic=markdown" title="markdown"><img src="https://raw.githubusercontent.com/github/explore/main/topics/markdown/markdown.png" alt="markdown" width="36" height="36" /></a>
+  <a href="https://github.com/briliov?tab=repositories&topic=nginx" title="nginx"><img src="https://raw.githubusercontent.com/github/explore/main/topics/nginx/nginx.png" alt="nginx" width="36" height="36" /></a>
+  <a href="https://github.com/briliov?tab=repositories&topic=nodejs" title="nodejs"><img src="https://raw.githubusercontent.com/github/explore/main/topics/nodejs/nodejs.png" alt="nodejs" width="36" height="36" /></a>
+  <a href="https://github.com/briliov?tab=repositories&topic=postgresql" title="postgresql"><img src="https://raw.githubusercontent.com/github/explore/main/topics/postgresql/postgresql.png" alt="postgresql" width="36" height="36" /></a>
+  <a href="https://github.com/briliov?tab=repositories&topic=powershell" title="powershell"><img src="https://raw.githubusercontent.com/github/explore/main/topics/powershell/powershell.png" alt="powershell" width="36" height="36" /></a>
+  <a href="https://github.com/briliov?tab=repositories&topic=pydantic" title="pydantic"><img src="https://raw.githubusercontent.com/github/explore/main/topics/pydantic/pydantic.png" alt="pydantic" width="36" height="36" /></a>
+  <a href="https://github.com/briliov?tab=repositories&topic=telegram" title="telegram"><img src="https://raw.githubusercontent.com/github/explore/main/topics/telegram/telegram.png" alt="telegram" width="36" height="36" /></a>
+  <a href="https://github.com/briliov?tab=repositories&topic=vk" title="vk"><img src="https://raw.githubusercontent.com/github/explore/main/topics/vk/vk.png" alt="vk" width="36" height="36" /></a>
+<!-- TECH_STACK:END -->
+</p>
