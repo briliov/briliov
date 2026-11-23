@@ -91,7 +91,7 @@ def process_badges(topic_repos: dict[str, list[str]], username: str, brand_color
         grouped_blocks[fallback_group].append(remaining_html)
 
     blocks = ['\n'.join(items) for items in grouped_blocks.values() if items]
-    return '\n<br>\n'.join(blocks)
+    return '\n<br><br>\n'.join(blocks)
 
 
 def main() -> None:
