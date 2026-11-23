@@ -6,9 +6,8 @@ from pathlib import Path
 import re
 import xml.etree.ElementTree as ET
 
-from profile_sync.config import BADGES_DIR
+from profile_sync.config import BADGES_DIR, SVG_NS
 
-SVG_NS = "http://w3.org"
 ET.register_namespace("", SVG_NS)
 
 
