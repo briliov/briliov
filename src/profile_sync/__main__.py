@@ -3,10 +3,16 @@ from __future__ import annotations
 from collections import defaultdict
 import logging
 import shutil
+import time
 import urllib.parse
 
 from profile_sync.config import BADGES_DIR, GITHUB_WEB_URL
-from profile_sync.github_client import collect_topics_map, fetch_metadata, get_username
+from profile_sync.github_client import (
+    classify_topic_via_github,
+    collect_topics_map,
+    fetch_metadata,
+    get_username,
+)
 from profile_sync.providers import build_pipeline, resolve_icon_info
 from profile_sync.reporter import print_console_report, update_readme
 from profile_sync.svg_builder import create_svg_badge
@@ -15,11 +21,11 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger(__name__)
 
 GROUP_ORDER = (
-    'Languages & Core',
+    'Backend & Core',
     'Frontend & Markup',
     'Databases',
-    'DevOps & Shell',
-    'Ecosystem & Tools',
+    'DevOps & Cloud',
+    'Tools & API',
 )
 
 
@@ -27,9 +33,8 @@ def process_badges(
     topic_repos: dict[str, list[str]],
     username: str,
     brand_colors: dict[str, str],
-    linguist_categories: dict[str, str],
+    linguist_map: dict[str, str],
 ) -> str:
-    """Rebuild badges grouped by GitHub Linguist taxonomy."""
     if BADGES_DIR.exists():
         shutil.rmtree(BADGES_DIR)
         logger.info('Cleaned badges directory: %s', BADGES_DIR)
@@ -42,16 +47,19 @@ def process_badges(
     total = len(topic_repos)
 
     for idx, (topic, repos) in enumerate(topic_repos.items(), start=1):
+        is_valid, category = classify_topic_via_github(topic, linguist_map)
+        time.sleep(0.25)
+        if not is_valid:
+            logger.info('[%d/%d] %-22s -> FILTERED (non-curated topic)', idx, total, topic)
+            continue
+
         icon_res = resolve_icon_info(topic, brand_colors, pipeline)
         if not icon_res:
             missing_icons[topic] = repos
-            logger.warning('[%d/%d] %-22s -> SKIPPED', idx, total, topic)
+            logger.warning('[%d/%d] %-22s -> SKIPPED (no icon)', idx, total, topic)
             continue
 
         create_svg_badge(topic, icon_res.data_uri)
-        clean_name = topic.replace('-', '')
-        category = linguist_categories.get(clean_name, 'Ecosystem & Tools')
-
         logger.info(
             '[%d/%d] %-22s -> OK | %s | group=%s',
             idx, total, topic, icon_res.provider, category,
@@ -74,20 +82,19 @@ def process_badges(
 
     print_console_report(username, matched_records, missing_icons)
 
-    blocks = []
-    for group in GROUP_ORDER:
-        items = grouped_html.get(group)
-        if items:
-            blocks.append('\n'.join(items))
+    blocks = [
+        '\n'.join(grouped_html[group])
+        for group in GROUP_ORDER
+        if grouped_html.get(group)
+    ]
     return '\n<br>\n'.join(blocks)
 
 
 def main() -> None:
-    """Collect repository topics, rebuild badges, and update README."""
     username = get_username()
-    brand_colors, linguist_categories = fetch_metadata()
+    brand_colors, linguist_map = fetch_metadata()
     topic_repos = collect_topics_map(username)
-    badges_html = process_badges(topic_repos, username, brand_colors, linguist_categories)
+    badges_html = process_badges(topic_repos, username, brand_colors, linguist_map)
     update_readme(badges_html)
 
 
