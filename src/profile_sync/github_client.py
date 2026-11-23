@@ -6,13 +6,12 @@ import json
 import logging
 import os
 import re
-import time
-import urllib.parse
+import urllib.error
 import urllib.request
 
 import yaml
 
-from profile_sync.config import DEVICON_META_URL, GITHUB_API_URL, LINGUIST_URL, REPO_ROOT, TOKEN
+from profile_sync.config import DEVICON_META_URL, EXPLORE_RAW_URL, GITHUB_API_URL, LINGUIST_URL, REPO_ROOT, TOKEN
 
 logger = logging.getLogger(__name__)
 SIMPLE_ICONS_META_URLS = (
@@ -21,10 +20,10 @@ SIMPLE_ICONS_META_URLS = (
 )
 
 DESC_RULES = (
-    (('database', 'sql', 'orm', 'relational'), 'Databases'),
-    (('css', 'html', 'frontend', 'front-end', 'markup', 'ui ', 'stylesheet'), 'Frontend & Markup'),
-    (('container', 'deploy', 'server', 'ci/cd', 'continuous integration', 'shell', 'cloud', 'proxy'), 'DevOps & Cloud'),
-    (('framework', 'backend', 'back-end', 'http', 'validation', 'programming language', 'runtime'), 'Backend & Core'),
+    (('database', 'sql', 'orm', 'relational', 'sqlite', 'postgres'), 'Databases'),
+    (('css', 'html', 'frontend', 'front-end', 'markup', 'stylesheet', 'bootstrap'), 'Frontend & Markup'),
+    (('container', 'deploy', 'server', 'ci/cd', 'continuous integration', 'shell', 'cloud', 'proxy', 'nginx', 'docker'), 'DevOps & Cloud'),
+    (('framework', 'backend', 'back-end', 'http', 'validation', 'programming language', 'runtime', 'python', 'django', 'flask', 'node'), 'Backend & Core'),
 )
 
 
@@ -100,30 +99,26 @@ def fetch_linguist_categories() -> dict[str, str]:
 
 
 def classify_topic_via_github(topic: str, linguist_map: dict[str, str]) -> tuple[bool, str]:
-    """Return (is_valid_tech, category) using GitHub Topics API + Linguist."""
+    """Classify topic using GitHub Linguist + official github/explore index.md."""
     clean = topic.replace('-', '')
     base_cat = linguist_map.get(clean)
+    if base_cat:
+        return True, base_cat
 
+    url = f'{EXPLORE_RAW_URL}/{topic}/index.md'
     try:
-        q = urllib.parse.quote(topic)
-        res = github_get(f'{GITHUB_API_URL}/search/topics?q={q}')
-        items = res.get('items', []) if isinstance(res, dict) else []
-        match = next((i for i in items if i.get('name', '').lower() == topic.lower()), None)
-
-        if match:
-            if not match.get('curated', False) and not base_cat:
-                return False, ''
-            if base_cat:
-                return True, base_cat
-            desc = (match.get('short_description') or match.get('description') or '').lower()
+        with urllib.request.urlopen(url, timeout=10) as response:
+            text = response.read().decode('utf-8').lower()
             for keywords, group in DESC_RULES:
-                if any(kw in desc for kw in keywords):
+                if any(kw in text for kw in keywords):
                     return True, group
             return True, 'Tools & API'
-    except Exception as exc:
-        logger.debug('Topic search fallback for %s: %s', topic, exc)
-
-    return True, base_cat or 'Tools & API'
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404 and topic.lower() == 'cli':
+            return False, ''
+        return True, 'Tools & API'
+    except Exception:
+        return True, 'Tools & API'
 
 
 def fetch_metadata() -> tuple[dict[str, str], dict[str, str]]:
