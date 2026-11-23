@@ -71,8 +71,13 @@ def process_badges(topic_repos: dict[str, list[str]], username: str, brand_color
         )
         filter_url = f'{GITHUB_WEB_URL}/{username}?tab=repositories&topic={urllib.parse.quote(topic)}'
         rendered_items[low_topic] = (
-            f'[![{label}](assets/badges/{topic}-light.svg#gh-light-mode-only)]({filter_url}) '
-            f'[![{label}](assets/badges/{topic}-dark.svg#gh-dark-mode-only)]({filter_url})'
+            f'  <a href="{filter_url}">'
+            f'<picture>'
+            f'<source media="(prefers-color-scheme: dark)" srcset="assets/badges/{topic}-dark.svg">'
+            f'<source media="(prefers-color-scheme: light)" srcset="assets/badges/{topic}-light.svg">'
+            f'<img src="assets/badges/{topic}-light.svg" alt="{label}" vspace="4" hspace="3">'
+            f'</picture>'
+            f'</a>'
         )
 
     print_console_report(username, matched_records, missing_icons)
@@ -87,7 +92,7 @@ def process_badges(topic_repos: dict[str, list[str]], username: str, brand_color
         grouped_blocks[fallback_group].append(remaining_html)
 
     blocks = ['\n'.join(items) for items in grouped_blocks.values() if items]
-    return '\n\n'.join(blocks)
+    return '\n<br><br>\n'.join(blocks)
 
 
 def main() -> None:
