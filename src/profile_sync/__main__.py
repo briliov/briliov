@@ -7,8 +7,13 @@ import urllib.parse
 
 import yaml
 
-from profile_sync.config import BADGES_DIR, CONFIG_PATH, GITHUB_WEB_URL
-from profile_sync.github_client import collect_topics_map, fetch_metadata, get_username
+from profile_sync.config import BADGES_DIR, CONFIG_PATH, END_MARKER, GITHUB_WEB_URL, START_MARKER
+from profile_sync.github_client import (
+    collect_repositories_data,
+    fetch_metadata,
+    get_username,
+    update_remote_repo_readme,
+)
 from profile_sync.providers import build_pipeline, resolve_icon_info
 from profile_sync.reporter import print_console_report, update_readme
 from profile_sync.svg_builder import create_svg_badge
@@ -27,18 +32,54 @@ def load_stack_config() -> tuple[set[str], dict[str, str], dict[str, list[str]]]
     return ignore, aliases, groups
 
 
-def process_badges(topic_repos: dict[str, list[str]], username: str, brand_colors: dict[str, str]) -> str:
+def format_grouped_html(
+    topics: list[str],
+    valid_topics: dict[str, str],
+    username: str,
+    groups: dict[str, list[str]],
+    base_asset_prefix: str,
+) -> str:
+    """Format badge links grouped by stack_config.yml for either local profile or remote repo."""
+    fallback_group = list(groups.keys())[-1] if groups else 'Tools & Ecosystem'
+    rendered_items: dict[str, str] = {}
+
+    for topic in topics:
+        low_topic = topic.lower()
+        if low_topic not in valid_topics:
+            continue
+        label = valid_topics[low_topic]
+        img_url = f'{base_asset_prefix}assets/badges/{topic}.svg'
+        filter_url = f'{GITHUB_WEB_URL}/{username}?tab=repositories&topic={urllib.parse.quote(topic)}'
+        rendered_items[low_topic] = (
+            f'  <a href="{filter_url}"><img src="{img_url}" alt="{label}" vspace="4" hspace="3"></a>'
+        )
+
+    grouped_blocks: dict[str, list[str]] = defaultdict(list)
+    for grp, ordered_topics in groups.items():
+        for t in ordered_topics:
+            if t in rendered_items:
+                grouped_blocks[grp].append(rendered_items.pop(t))
+
+    for remaining_html in rendered_items.values():
+        grouped_blocks[fallback_group].append(remaining_html)
+
+    blocks = ['\n'.join(items) for items in grouped_blocks.values() if items]
+    return '\n<br><br>\n'.join(blocks)
+
+
+def main() -> None:
+    username = get_username()
+    brand_colors, _ = fetch_metadata()
+    topic_repos, repo_topics = collect_repositories_data(username)
+
     if BADGES_DIR.exists():
         shutil.rmtree(BADGES_DIR)
-        logger.info('Cleaned badges directory: %s', BADGES_DIR)
     BADGES_DIR.mkdir(parents=True, exist_ok=True)
 
     ignore, aliases, groups = load_stack_config()
-    topic_to_group = {t: grp for grp, items in groups.items() for t in items}
-    fallback_group = list(groups.keys())[-1] if groups else 'Tools & Ecosystem'
-
     pipeline = build_pipeline()
-    rendered_items: dict[str, str] = {}
+
+    valid_topics: dict[str, str] = {}
     matched_records: list[dict] = []
     missing_icons: dict[str, list[str]] = {}
     total = len(topic_repos)
@@ -57,9 +98,9 @@ def process_badges(topic_repos: dict[str, list[str]], username: str, brand_color
 
         label = aliases.get(low_topic, topic.replace('-', ' ')).upper()
         create_svg_badge(topic, icon_res.data_uri, icon_res.color, display_label=label)
-        group_name = topic_to_group.get(low_topic, fallback_group)
+        valid_topics[low_topic] = label
 
-        logger.info('[%d/%d] %-22s -> OK | %s | group=%s', idx, total, topic, icon_res.provider, group_name)
+        logger.info('[%d/%d] %-22s -> OK | %s', idx, total, topic, icon_res.provider)
         matched_records.append(
             {
                 'topic': topic,
@@ -69,33 +110,17 @@ def process_badges(topic_repos: dict[str, list[str]], username: str, brand_color
                 'count': len(repos),
             }
         )
-        rel_path = f'assets/badges/{topic}.svg'
-        filter_url = f'{GITHUB_WEB_URL}/{username}?tab=repositories&topic={urllib.parse.quote(topic)}'
-        rendered_items[low_topic] = (
-            f'  <a href="{filter_url}"><img src="{rel_path}" alt="{label}" vspace="4" hspace="3"></a>'
-        )
 
     print_console_report(username, matched_records, missing_icons)
 
-    grouped_blocks: dict[str, list[str]] = defaultdict(list)
-    for grp, ordered_topics in groups.items():
-        for t in ordered_topics:
-            if t in rendered_items:
-                grouped_blocks[grp].append(rendered_items.pop(t))
+    profile_html = format_grouped_html(list(topic_repos.keys()), valid_topics, username, groups, base_asset_prefix='')
+    update_readme(profile_html)
 
-    for remaining_html in rendered_items.values():
-        grouped_blocks[fallback_group].append(remaining_html)
-
-    blocks = ['\n'.join(items) for items in grouped_blocks.values() if items]
-    return '\n<br><br>\n'.join(blocks)
-
-
-def main() -> None:
-    username = get_username()
-    brand_colors, _ = fetch_metadata()
-    topic_repos = collect_topics_map(username)
-    badges_html = process_badges(topic_repos, username, brand_colors)
-    update_readme(badges_html)
+    raw_prefix = f'https://githubusercontent.com{username}/{username}/main/'
+    for repo_name, topics in sorted(repo_topics.items()):
+        repo_html = format_grouped_html(topics, valid_topics, username, groups, base_asset_prefix=raw_prefix)
+        if repo_html:
+            update_remote_repo_readme(username, repo_name, repo_html, START_MARKER, END_MARKER)
 
 
 if __name__ == '__main__':

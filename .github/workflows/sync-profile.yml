@@ -33,7 +33,7 @@ jobs:
 
       - name: Update README stack badges
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
         run: profile-sync
 
       - name: Commit and push README and badges if changed
