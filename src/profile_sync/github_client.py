@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections import defaultdict
+from collections import Counter, defaultdict
 import colorsys
 import json
 import logging
@@ -16,38 +16,18 @@ SIMPLE_ICONS_META_URLS = (
     '.'.join(('https://raw', 'githubusercontent', 'com/simple-icons/simple-icons/develop/_data/simple-icons.json')),
 )
 
-TAG_TO_GROUP = (
-    ('database', 'Databases'),
-    ('sql', 'Databases'),
-    ('orm', 'Databases'),
-    ('css', 'Frontend'),
-    ('html', 'Frontend'),
-    ('frontend', 'Frontend'),
-    ('ui', 'Frontend'),
-    ('styling', 'Frontend'),
-    ('markup', 'Frontend'),
-    ('container', 'DevOps & Cloud'),
-    ('deployment', 'DevOps & Cloud'),
-    ('devops', 'DevOps & Cloud'),
-    ('cloud', 'DevOps & Cloud'),
-    ('ci', 'DevOps & Cloud'),
-    ('server', 'DevOps & Cloud'),
-    ('hosting', 'DevOps & Cloud'),
-    ('shell', 'DevOps & Cloud'),
-    ('terminal', 'DevOps & Cloud'),
-    ('docker', 'DevOps & Cloud'),
-    ('python', 'Backend & Core'),
-    ('django', 'Backend & Core'),
-    ('pydantic', 'Backend & Core'),
-    ('http', 'Backend & Core'),
-    ('backend', 'Backend & Core'),
-    ('framework', 'Backend & Core'),
-    ('runtime', 'Backend & Core'),
-    ('language', 'Backend & Core'),
-    ('testing', 'Testing & Tools'),
-    ('vcs', 'Testing & Tools'),
-    ('api', 'Testing & Tools'),
-)
+CORE_META_MAP = {
+    'database': 'Databases',
+    'frontend': 'Frontend',
+    'css': 'Frontend',
+    'devops': 'DevOps & Cloud',
+    'cloud': 'DevOps & Cloud',
+    'container': 'DevOps & Cloud',
+    'server': 'DevOps & Cloud',
+    'backend': 'Backend & Core',
+    'framework': 'Backend & Core',
+    'language': 'Backend & Core',
+}
 
 
 def get_username() -> str:
@@ -74,7 +54,6 @@ def _boost_dark_color(hex_str: str) -> str:
 
     if s < 0.12 and l < 0.65:
         return '#ffffff'
-
     if l < 0.65:
         l = 0.68
 
@@ -82,17 +61,9 @@ def _boost_dark_color(hex_str: str) -> str:
     return f'#{int(nr * 255):02x}{int(ng * 255):02x}{int(nb * 255):02x}'
 
 
-def _detect_category(name: str, tags: list[str]) -> str:
-    lowered = {t.lower() for t in tags} | {name.lower()}
-    for keyword, group in TAG_TO_GROUP:
-        if keyword in lowered or keyword in name.lower():
-            return group
-    return 'Testing & Tools'
-
-
 def fetch_metadata() -> tuple[dict[str, str], dict[str, str]]:
     colors: dict[str, str] = {}
-    categories: dict[str, str] = {}
+    base_categories: dict[str, str] = {}
 
     for meta_url in SIMPLE_ICONS_META_URLS:
         try:
@@ -104,7 +75,6 @@ def fetch_metadata() -> tuple[dict[str, str], dict[str, str]]:
                     hex_color = item.get('hex', '')
                     if slug and hex_color:
                         colors[slug] = _boost_dark_color(hex_color)
-                        categories[slug] = _detect_category(slug, [])
                 break
         except Exception:
             continue
@@ -115,16 +85,47 @@ def fetch_metadata() -> tuple[dict[str, str], dict[str, str]]:
             for item in dev_data:
                 name = item.get('name', '')
                 hex_color = item.get('color', '')
-                tags = item.get('tags', [])
+                tags = {t.lower() for t in item.get('tags', []) if isinstance(t, str)}
                 if name:
                     if hex_color:
                         colors[name] = _boost_dark_color(hex_color)
-                    if isinstance(tags, list):
-                        categories[name] = _detect_category(name, tags)
+                    for tag, group in CORE_META_MAP.items():
+                        if tag in tags:
+                            base_categories[name] = group
+                            break
     except Exception as exc:
         logger.warning('Could not fetch devicon.json metadata: %s', exc)
 
-    return colors, categories
+    return colors, base_categories
+
+
+def infer_categories_from_context(
+    topic_repos: dict[str, list[str]],
+    base_categories: dict[str, str],
+) -> dict[str, str]:
+    """Infer missing categories from co-occurring topics inside repositories."""
+    repo_topics: dict[str, list[str]] = defaultdict(list)
+    for topic, repos in topic_repos.items():
+        for repo in repos:
+            repo_topics[repo].append(topic)
+
+    resolved: dict[str, str] = {}
+    for topic, repos in topic_repos.items():
+        clean = topic.replace('-', '')
+        if clean in base_categories:
+            resolved[clean] = base_categories[clean]
+            continue
+
+        votes: Counter[str] = Counter()
+        for repo in repos:
+            for neighbor in repo_topics[repo]:
+                n_clean = neighbor.replace('-', '')
+                if n_clean in base_categories:
+                    votes[base_categories[n_clean]] += 1
+
+        resolved[clean] = votes.most_common(1)[0][0] if votes else 'Testing & Tools'
+
+    return resolved
 
 
 def collect_topics_map(username: str) -> dict[str, list[str]]:
@@ -138,6 +139,6 @@ def collect_topics_map(username: str) -> dict[str, list[str]]:
                 continue
             for topic in repo.get('topics', []):
                 topic_repos[topic].append(repo_name)
-    sorted_items = sorted(topic_repos.items(), key=lambda item: (-len(item), item))
+    sorted_items = sorted(topic_repos.items(), key=lambda item: (-len(item[1]), item[0]))
     logger.info('Collected %d unique topics.', len(sorted_items))
     return dict(sorted_items)

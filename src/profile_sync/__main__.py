@@ -6,7 +6,12 @@ import shutil
 import urllib.parse
 
 from profile_sync.config import BADGES_DIR, GITHUB_WEB_URL
-from profile_sync.github_client import collect_topics_map, fetch_metadata, get_username
+from profile_sync.github_client import (
+    collect_topics_map,
+    fetch_metadata,
+    get_username,
+    infer_categories_from_context,
+)
 from profile_sync.providers import build_pipeline, resolve_icon_info
 from profile_sync.reporter import print_console_report, update_readme
 from profile_sync.svg_builder import create_svg_badge
@@ -77,8 +82,9 @@ def process_badges(
 
 def main() -> None:
     username = get_username()
-    brand_colors, auto_categories = fetch_metadata()
+    brand_colors, base_categories = fetch_metadata()
     topic_repos = collect_topics_map(username)
+    auto_categories = infer_categories_from_context(topic_repos, base_categories)
     badges_html = process_badges(topic_repos, username, brand_colors, auto_categories)
     update_readme(badges_html)
 
