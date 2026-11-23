@@ -11,7 +11,7 @@ from profile_sync.config import BADGES_DIR, CONFIG_PATH, GITHUB_WEB_URL
 from profile_sync.github_client import collect_topics_map, fetch_metadata, get_username
 from profile_sync.providers import build_pipeline, resolve_icon_info
 from profile_sync.reporter import print_console_report, update_readme
-from profile_sync.svg_builder import create_themed_badges
+from profile_sync.svg_builder import create_svg_badge
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s', datefmt='%H:%M:%S')
 logger = logging.getLogger(__name__)
@@ -56,7 +56,7 @@ def process_badges(topic_repos: dict[str, list[str]], username: str, brand_color
             continue
 
         label = aliases.get(low_topic, topic.replace('-', ' ')).upper()
-        create_themed_badges(topic, icon_res.data_uri, icon_res.color, display_label=label)
+        create_svg_badge(topic, icon_res.data_uri, icon_res.color, display_label=label)
         group_name = topic_to_group.get(low_topic, fallback_group)
 
         logger.info('[%d/%d] %-22s -> OK | %s | group=%s', idx, total, topic, icon_res.provider, group_name)
@@ -69,14 +69,10 @@ def process_badges(topic_repos: dict[str, list[str]], username: str, brand_color
                 'count': len(repos),
             }
         )
+        rel_path = f'assets/badges/{topic}.svg'
         filter_url = f'{GITHUB_WEB_URL}/{username}?tab=repositories&topic={urllib.parse.quote(topic)}'
         rendered_items[low_topic] = (
-            f'  <a href="{filter_url}">'
-            f'<picture>'
-            f'<source media="(prefers-color-scheme: dark)" srcset="assets/badges/{topic}-dark.svg">'
-            f'<img src="assets/badges/{topic}-light.svg" alt="{label}" vspace="4" hspace="3">'
-            f'</picture>'
-            f'</a>'
+            f'  <a href="{filter_url}"><img src="{rel_path}" alt="{label}" vspace="4" hspace="3"></a>'
         )
 
     print_console_report(username, matched_records, missing_icons)

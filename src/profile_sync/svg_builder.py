@@ -8,26 +8,19 @@ import xml.etree.ElementTree as ET
 from profile_sync.config import BADGES_DIR
 
 
-def adjust_color_for_theme(hex_str: str, theme: str) -> str:
-    """Adapt icon color contrast separately for light and dark GitHub themes."""
+def adjust_universal_color(hex_str: str) -> str:
+    """Tune color lightness to remain readable on both light and dark backgrounds."""
     clean_hex = hex_str.lstrip('#')
     if len(clean_hex) != 6:
-        return '#24292f' if theme == 'light' else '#f0f6fc'
+        return '#7d8590'
 
     r, g, b = (int(clean_hex[i : i + 2], 16) / 255.0 for i in (0, 2, 4))
     h, l, s = colorsys.rgb_to_hls(r, g, b)
 
-    if theme == 'light':
-        if s < 0.12 and l > 0.45:
-            return '#24292f'
-        if l > 0.48:
-            l = 0.42
-    else:
-        if s < 0.12 and l < 0.65:
-            return '#f0f6fc'
-        if l < 0.65:
-            l = 0.68
+    if s < 0.15:
+        return '#7d8590'
 
+    l = max(0.42, min(0.54, l))
     nr, ng, nb = colorsys.hls_to_rgb(h, l, s)
     return f'#{int(nr * 255):02x}{int(ng * 255):02x}{int(nb * 255):02x}'
 
@@ -58,23 +51,22 @@ def colorize_svg(svg_bytes: bytes, hex_color: str) -> str:
         return f'data:image/svg+xml;base64,{encoded}'
 
 
-def recolor_data_uri(data_uri: str, raw_color: str, theme: str) -> str:
-    """Recolor an embedded SVG data URI for the target theme if applicable."""
+def recolor_data_uri(data_uri: str, raw_color: str) -> str:
     prefix = 'data:image/svg+xml;base64,'
     if not data_uri.startswith(prefix) or not raw_color.startswith('#'):
         return data_uri
     svg_bytes = base64.b64decode(data_uri[len(prefix) :])
-    themed_hex = adjust_color_for_theme(raw_color, theme)
-    return colorize_svg(svg_bytes, themed_hex)
+    universal_hex = adjust_universal_color(raw_color)
+    return colorize_svg(svg_bytes, universal_hex)
 
 
-def create_themed_badges(
+def create_svg_badge(
     topic: str,
     icon_data: str,
     raw_color: str,
     display_label: str | None = None,
-) -> tuple[Path, Path]:
-    """Generate both -light.svg and -dark.svg badges for GitHub <picture>."""
+) -> Path:
+    """Generate a single translucent glass-style SVG badge for any theme."""
     label = (display_label or topic.replace('-', ' ')).upper()
     char_width = 9.2
     text_width = int(len(label) * char_width)
@@ -83,25 +75,17 @@ def create_themed_badges(
     text_x = (13 + icon_offset) + (text_width / 2)
     svg_ns = 'http://www.' + 'w3.org/2000/svg'
 
-    themes = {
-        'light': ('#f6f8fa', '#d0d7de', '#24292f'),
-        'dark': ('#161b22', '#30363d', '#f0f6fc'),
-    }
-    paths: dict[str, Path] = {}
-
-    for theme, (bg, border, text_fill) in themes.items():
-        themed_icon = recolor_data_uri(icon_data, raw_color, theme)
-        lines = [
-            f'<svg xmlns="{svg_ns}" width="{total_width}" height="30" role="img" aria-label="{label}">',
-            f'  <rect x="0.5" y="0.5" width="{total_width - 1}" height="29" rx="6" fill="{bg}" stroke="{border}" stroke-width="1" />',
-            f'  <image x="12" y="7.5" width="15" height="15" href="{themed_icon}" />',
-            f'  <text x="{text_x:.1f}" y="19" fill="{text_fill}" '
-            f'font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" '
-            f'font-size="11" font-weight="800" text-anchor="middle" letter-spacing="1.5">{label}</text>',
-            '</svg>',
-        ]
-        out_path = BADGES_DIR / f'{topic}-{theme}.svg'
-        out_path.write_text('\n'.join(lines) + '\n', encoding='utf-8')
-        paths[theme] = out_path
-
-    return paths['light'], paths['dark']
+    themed_icon = recolor_data_uri(icon_data, raw_color)
+    lines = [
+        f'<svg xmlns="{svg_ns}" width="{total_width}" height="30" role="img" aria-label="{label}">',
+        f'  <rect x="0.5" y="0.5" width="{total_width - 1}" height="29" rx="6" '
+        f'fill="#8b949e" fill-opacity="0.14" stroke="#8b949e" stroke-opacity="0.32" stroke-width="1" />',
+        f'  <image x="12" y="7.5" width="15" height="15" href="{themed_icon}" />',
+        f'  <text x="{text_x:.1f}" y="19" fill="#7d8590" '
+        f'font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" '
+        f'font-size="11" font-weight="800" text-anchor="middle" letter-spacing="1.5">{label}</text>',
+        '</svg>',
+    ]
+    badge_path = BADGES_DIR / f'{topic}.svg'
+    badge_path.write_text('\n'.join(lines) + '\n', encoding='utf-8')
+    return badge_path
