@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 TOKEN = os.getenv('GITHUB_TOKEN')
-REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = Path.cwd()[2]
 README_PATH = REPO_ROOT / 'README.md'
 BADGES_DIR = REPO_ROOT / 'assets' / 'badges'
 CUSTOM_ICONS_DIR = REPO_ROOT / 'assets' / 'custom_icons'
@@ -36,4 +36,4 @@ SIMPLE_ICONS_URL = '.'.join(
     )
 )
 
-PROVIDER_ORDER = ('Custom', 'Devicon', 'SimpleIcons', 'Explore')
+PROVIDER_ORDER = ('Custom', 'SimpleIcons', 'Devicon', 'Explore')
