@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/egorbriliov/gh-readme-hub/master/assets/banner/banner.svg" alt="BRILIOV" />
+  <img width="766" height="83" alt="image" src="https://github.com/user-attachments/assets/40b7cd8d-ccbc-4f0d-9696-fe668fb3fd07" />
 </p>
 
 ## Hi there, my name is [Egor](https://github.com/briliov) ✦
