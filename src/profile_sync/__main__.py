@@ -7,7 +7,13 @@ import urllib.parse
 
 import yaml
 
-from profile_sync.config import BADGES_DIR, CONFIG_PATH, END_MARKER, GITHUB_WEB_URL, START_MARKER
+from profile_sync.config import (
+    BADGES_DIR,
+    CONFIG_PATH,
+    END_MARKER,
+    GITHUB_WEB_URL,
+    START_MARKER,
+)
 from profile_sync.github_client import (
     collect_repositories_data,
     fetch_metadata,
@@ -18,17 +24,28 @@ from profile_sync.providers import build_pipeline, resolve_icon_info
 from profile_sync.reporter import print_console_report, update_readme
 from profile_sync.svg_builder import create_svg_badge
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s', datefmt='%H:%M:%S')
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    datefmt='%H:%M:%S',
+)
 logger = logging.getLogger(__name__)
 
 
-def load_stack_config() -> tuple[set[str], dict[str, str], dict[str, list[str]]]:
+def load_stack_config() -> tuple[
+    set[str], dict[str, str], dict[str, list[str]]
+]:
     if not CONFIG_PATH.is_file():
         return set(), {}, {}
     raw = yaml.safe_load(CONFIG_PATH.read_text(encoding='utf-8')) or {}
     ignore = {str(t).lower() for t in raw.get('ignore', [])}
-    aliases = {str(k).lower(): str(v) for k, v in (raw.get('aliases') or {}).items()}
-    groups = {str(g): [str(t).lower() for t in items] for g, items in (raw.get('groups') or {}).items()}
+    aliases = {
+        str(k).lower(): str(v) for k, v in (raw.get('aliases') or {}).items()
+    }
+    groups = {
+        str(g): [str(t).lower() for t in items]
+        for g, items in (raw.get('groups') or {}).items()
+    }
     return ignore, aliases, groups
 
 
@@ -97,10 +114,14 @@ def main() -> None:
             continue
 
         label = aliases.get(low_topic, topic.replace('-', ' ')).upper()
-        create_svg_badge(topic, icon_res.data_uri, icon_res.color, display_label=label)
+        create_svg_badge(
+            topic, icon_res.data_uri, icon_res.color, display_label=label
+        )
         valid_topics[low_topic] = label
 
-        logger.info('[%d/%d] %-22s -> OK | %s', idx, total, topic, icon_res.provider)
+        logger.info(
+            '[%d/%d] %-22s -> OK | %s', idx, total, topic, icon_res.provider
+        )
         matched_records.append(
             {
                 'topic': topic,
@@ -113,14 +134,28 @@ def main() -> None:
 
     print_console_report(username, matched_records, missing_icons)
 
-    profile_html = format_grouped_html(list(topic_repos.keys()), valid_topics, username, groups, base_asset_prefix='')
+    profile_html = format_grouped_html(
+        list(topic_repos.keys()),
+        valid_topics,
+        username,
+        groups,
+        base_asset_prefix='',
+    )
     update_readme(profile_html)
 
-    raw_prefix = f'https://://github.com{username}/{username}/raw/HEAD/'
+    raw_prefix = f'https://://github.com/{username}/{username}/raw/HEAD/'
     for repo_name, topics in sorted(repo_topics.items()):
-        repo_html = format_grouped_html(topics, valid_topics, username, groups, base_asset_prefix=raw_prefix)
+        repo_html = format_grouped_html(
+            topics,
+            valid_topics,
+            username,
+            groups,
+            base_asset_prefix=raw_prefix,
+        )
         if repo_html:
-            update_remote_repo_readme(username, repo_name, repo_html, START_MARKER, END_MARKER)
+            update_remote_repo_readme(
+                username, repo_name, repo_html, START_MARKER, END_MARKER
+            )
 
 
 if __name__ == '__main__':
