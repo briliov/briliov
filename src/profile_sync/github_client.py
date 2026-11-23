@@ -18,19 +18,31 @@ SIMPLE_ICONS_META_URLS = (
 
 TAG_TO_GROUP = (
     ('database', 'Databases'),
-    ('frontend', 'Frontend'),
+    ('sql', 'Databases'),
+    ('orm', 'Databases'),
     ('css', 'Frontend'),
+    ('html', 'Frontend'),
+    ('frontend', 'Frontend'),
     ('ui', 'Frontend'),
+    ('styling', 'Frontend'),
+    ('markup', 'Frontend'),
+    ('container', 'DevOps & Cloud'),
+    ('deployment', 'DevOps & Cloud'),
     ('devops', 'DevOps & Cloud'),
     ('cloud', 'DevOps & Cloud'),
-    ('hosting', 'DevOps & Cloud'),
+    ('ci', 'DevOps & Cloud'),
     ('server', 'DevOps & Cloud'),
+    ('hosting', 'DevOps & Cloud'),
+    ('shell', 'DevOps & Cloud'),
+    ('terminal', 'DevOps & Cloud'),
+    ('python', 'Backend & Core'),
+    ('backend', 'Backend & Core'),
+    ('framework', 'Backend & Core'),
+    ('runtime', 'Backend & Core'),
+    ('language', 'Backend & Core'),
     ('testing', 'Testing & Tools'),
     ('vcs', 'Testing & Tools'),
     ('api', 'Testing & Tools'),
-    ('language', 'Backend & Core'),
-    ('backend', 'Backend & Core'),
-    ('framework', 'Backend & Core'),
 )
 
 
@@ -49,7 +61,6 @@ def github_get(url: str) -> list | dict:
 
 
 def _boost_dark_color(hex_str: str) -> str:
-    """Keep original hue & saturation, but lift lightness if too dark for #000."""
     clean_hex = hex_str.lstrip('#')
     if len(clean_hex) != 6:
         return '#ffffff'
@@ -60,23 +71,22 @@ def _boost_dark_color(hex_str: str) -> str:
     if s < 0.12 and l < 0.65:
         return '#ffffff'
 
-    if l < 0.58:
-        l = 0.62
+    if l < 0.65:
+        l = 0.68
 
     nr, ng, nb = colorsys.hls_to_rgb(h, l, s)
     return f'#{int(nr * 255):02x}{int(ng * 255):02x}{int(nb * 255):02x}'
 
 
-def _detect_category(tags: list[str]) -> str:
-    lowered = {t.lower() for t in tags}
+def _detect_category(name: str, tags: list[str]) -> str:
+    lowered = {t.lower() for t in tags} | {name.lower()}
     for keyword, group in TAG_TO_GROUP:
-        if keyword in lowered:
+        if any(keyword in item for item in lowered):
             return group
     return 'Testing & Tools'
 
 
 def fetch_metadata() -> tuple[dict[str, str], dict[str, str]]:
-    """Fetch (brand_colors, auto_categories) from Simple Icons & Devicon."""
     colors: dict[str, str] = {}
     categories: dict[str, str] = {}
 
@@ -90,6 +100,7 @@ def fetch_metadata() -> tuple[dict[str, str], dict[str, str]]:
                     hex_color = item.get('hex', '')
                     if slug and hex_color:
                         colors[slug] = _boost_dark_color(hex_color)
+                        categories[slug] = _detect_category(slug, [])
                 break
         except Exception:
             continue
@@ -105,7 +116,7 @@ def fetch_metadata() -> tuple[dict[str, str], dict[str, str]]:
                     if hex_color:
                         colors[name] = _boost_dark_color(hex_color)
                     if isinstance(tags, list):
-                        categories[name] = _detect_category(tags)
+                        categories[name] = _detect_category(name, tags)
     except Exception as exc:
         logger.warning('Could not fetch devicon.json metadata: %s', exc)
 
@@ -123,6 +134,6 @@ def collect_topics_map(username: str) -> dict[str, list[str]]:
                 continue
             for topic in repo.get('topics', []):
                 topic_repos[topic].append(repo_name)
-    sorted_items = sorted(topic_repos.items(), key=lambda item: (-len(item[1]), item[0]))
+    sorted_items = sorted(topic_repos.items(), key=lambda item: (-len(item), item))
     logger.info('Collected %d unique topics.', len(sorted_items))
     return dict(sorted_items)
