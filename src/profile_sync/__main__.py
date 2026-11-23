@@ -143,7 +143,7 @@ def main() -> None:
     )
     update_readme(profile_html)
 
-    raw_prefix = f'https://://github.com/{username}/{username}/raw/HEAD/'
+    raw_prefix = f'https://://github.com//{username}/raw/HEAD/'
     for repo_name, topics in sorted(repo_topics.items()):
         repo_html = format_grouped_html(
             topics,
