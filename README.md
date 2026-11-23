@@ -91,7 +91,9 @@
   <a href="https://github.com/briliov?tab=repositories&topic=pydantic"><img src="assets/badges/pydantic.svg" alt="PYDANTIC" vspace="3" hspace="2" /></a>
   <a href="https://github.com/briliov?tab=repositories&topic=pytest"><img src="assets/badges/pytest.svg" alt="PYTEST" vspace="3" hspace="2" /></a>
   <a href="https://github.com/briliov?tab=repositories&topic=python"><img src="assets/badges/python.svg" alt="PYTHON" vspace="3" hspace="2" /></a>
+  <a href="https://github.com/briliov?tab=repositories&topic=pythonanywhere"><img src="assets/badges/pythonanywhere.svg" alt="PYTHONANYWHERE" vspace="3" hspace="2" /></a>
   <a href="https://github.com/briliov?tab=repositories&topic=ruff"><img src="assets/badges/ruff.svg" alt="RUFF" vspace="3" hspace="2" /></a>
+  <a href="https://github.com/briliov?tab=repositories&topic=sql"><img src="assets/badges/sql.svg" alt="SQL" vspace="3" hspace="2" /></a>
   <a href="https://github.com/briliov?tab=repositories&topic=sqlalchemy"><img src="assets/badges/sqlalchemy.svg" alt="SQLALCHEMY" vspace="3" hspace="2" /></a>
   <a href="https://github.com/briliov?tab=repositories&topic=sqlite"><img src="assets/badges/sqlite.svg" alt="SQLITE" vspace="3" hspace="2" /></a>
   <a href="https://github.com/briliov?tab=repositories&topic=swagger"><img src="assets/badges/swagger.svg" alt="SWAGGER" vspace="3" hspace="2" /></a>

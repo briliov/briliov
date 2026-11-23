@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+import colorsys
 import json
 import logging
 import os
@@ -13,6 +14,23 @@ logger = logging.getLogger(__name__)
 SIMPLE_ICONS_META_URLS = (
     '.'.join(('https://raw', 'githubusercontent', 'com/simple-icons/simple-icons/develop/data/simple-icons.json')),
     '.'.join(('https://raw', 'githubusercontent', 'com/simple-icons/simple-icons/develop/_data/simple-icons.json')),
+)
+
+TAG_TO_GROUP = (
+    ('database', 'Databases'),
+    ('frontend', 'Frontend'),
+    ('css', 'Frontend'),
+    ('ui', 'Frontend'),
+    ('devops', 'DevOps & Cloud'),
+    ('cloud', 'DevOps & Cloud'),
+    ('hosting', 'DevOps & Cloud'),
+    ('server', 'DevOps & Cloud'),
+    ('testing', 'Testing & Tools'),
+    ('vcs', 'Testing & Tools'),
+    ('api', 'Testing & Tools'),
+    ('language', 'Backend & Core'),
+    ('backend', 'Backend & Core'),
+    ('framework', 'Backend & Core'),
 )
 
 
@@ -30,18 +48,37 @@ def github_get(url: str) -> list | dict:
         return json.loads(response.read().decode('utf-8'))
 
 
-def _apply_contrast_filter(hex_str: str) -> str:
+def _boost_dark_color(hex_str: str) -> str:
+    """Keep original hue & saturation, but lift lightness if too dark for #000."""
     clean_hex = hex_str.lstrip('#')
-    if len(clean_hex) == 6:
-        r, g, b = (int(clean_hex[i : i + 2], 16) for i in (0, 2, 4))
-        luminance = 0.299 * r + 0.587 * g + 0.114 * b
-        return f'#{clean_hex}' if luminance >= 75 else '#ffffff'
-    return '#ffffff'
+    if len(clean_hex) != 6:
+        return '#ffffff'
+
+    r, g, b = (int(clean_hex[i : i + 2], 16) / 255.0 for i in (0, 2, 4))
+    h, l, s = colorsys.rgb_to_hls(r, g, b)
+
+    if s < 0.12 and l < 0.65:
+        return '#ffffff'
+
+    if l < 0.58:
+        l = 0.62
+
+    nr, ng, nb = colorsys.hls_to_rgb(h, l, s)
+    return f'#{int(nr * 255):02x}{int(ng * 255):02x}{int(nb * 255):02x}'
 
 
-def fetch_brand_colors() -> dict[str, str]:
-    """Fetch brand hex colors from Simple Icons and Devicon with contrast filter."""
+def _detect_category(tags: list[str]) -> str:
+    lowered = {t.lower() for t in tags}
+    for keyword, group in TAG_TO_GROUP:
+        if keyword in lowered:
+            return group
+    return 'Testing & Tools'
+
+
+def fetch_metadata() -> tuple[dict[str, str], dict[str, str]]:
+    """Fetch (brand_colors, auto_categories) from Simple Icons & Devicon."""
     colors: dict[str, str] = {}
+    categories: dict[str, str] = {}
 
     for meta_url in SIMPLE_ICONS_META_URLS:
         try:
@@ -52,8 +89,7 @@ def fetch_brand_colors() -> dict[str, str]:
                     slug = re.sub(r'[^a-z0-9]', '', item.get('title', '').lower())
                     hex_color = item.get('hex', '')
                     if slug and hex_color:
-                        colors[slug] = _apply_contrast_filter(hex_color)
-                logger.info('Loaded %d brand colors from Simple Icons.', len(colors))
+                        colors[slug] = _boost_dark_color(hex_color)
                 break
         except Exception:
             continue
@@ -64,12 +100,16 @@ def fetch_brand_colors() -> dict[str, str]:
             for item in dev_data:
                 name = item.get('name', '')
                 hex_color = item.get('color', '')
-                if name and hex_color:
-                    colors[name] = _apply_contrast_filter(hex_color)
+                tags = item.get('tags', [])
+                if name:
+                    if hex_color:
+                        colors[name] = _boost_dark_color(hex_color)
+                    if isinstance(tags, list):
+                        categories[name] = _detect_category(tags)
     except Exception as exc:
-        logger.warning('Could not fetch devicon.json colors: %s', exc)
+        logger.warning('Could not fetch devicon.json metadata: %s', exc)
 
-    return colors
+    return colors, categories
 
 
 def collect_topics_map(username: str) -> dict[str, list[str]]:
@@ -83,6 +123,6 @@ def collect_topics_map(username: str) -> dict[str, list[str]]:
                 continue
             for topic in repo.get('topics', []):
                 topic_repos[topic].append(repo_name)
-    sorted_items = sorted(topic_repos.items(), key=lambda item: (-len(item), item))
+    sorted_items = sorted(topic_repos.items(), key=lambda item: (-len(item[1]), item[0]))
     logger.info('Collected %d unique topics.', len(sorted_items))
     return dict(sorted_items)
