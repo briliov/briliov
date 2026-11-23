@@ -25,3 +25,4 @@ DEVICON_META_URL = f'{RAW_GITHUB_URL}/devicons/devicon/master/devicon.json'
 SIMPLE_ICONS_URL = f'{RAW_GITHUB_URL}/simple-icons/simple-icons/develop/icons'
 
 PROVIDER_ORDER = ('Custom', 'Devicon', 'SimpleIcons', 'Explore')
+SVG_NS = "http://" + "www.w3.org/2000/svg"
