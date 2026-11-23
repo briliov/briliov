@@ -8,12 +8,29 @@ import os
 import re
 import urllib.request
 
-from profile_sync.config import DEVICON_META_URL, GITHUB_API_URL, REPO_ROOT, TOKEN
+from profile_sync.config import (
+    DEVICON_META_URL,
+    GITHUB_API_URL,
+    REPO_ROOT,
+    TOKEN,
+)
 
 logger = logging.getLogger(__name__)
 SIMPLE_ICONS_META_URLS = (
-    '.'.join(('https://raw', 'githubusercontent', 'com/simple-icons/simple-icons/develop/data/simple-icons.json')),
-    '.'.join(('https://raw', 'githubusercontent', 'com/simple-icons/simple-icons/develop/_data/simple-icons.json')),
+    '.'.join(
+        (
+            'https://raw',
+            'githubusercontent',
+            'com/simple-icons/simple-icons/develop/data/simple-icons.json',
+        )
+    ),
+    '.'.join(
+        (
+            'https://raw',
+            'githubusercontent',
+            'com/simple-icons/simple-icons/develop/_data/simple-icons.json',
+        )
+    ),
 )
 
 
@@ -23,7 +40,10 @@ def get_username() -> str:
 
 
 def github_get(url: str) -> list | dict:
-    headers = {'Accept': 'application/vnd.github+json', 'User-Agent': 'Profile-Stack-Sync'}
+    headers = {
+        'Accept': 'application/vnd.github+json',
+        'User-Agent': 'Profile-Stack-Sync',
+    }
     if TOKEN:
         headers['Authorization'] = f'Bearer {TOKEN}'
     req = urllib.request.Request(url, headers=headers)
@@ -53,10 +73,16 @@ def fetch_metadata() -> tuple[dict[str, str], dict[str, str]]:
     for meta_url in SIMPLE_ICONS_META_URLS:
         try:
             si_data = github_get(meta_url)
-            icons_list = si_data.get('icons', []) if isinstance(si_data, dict) else si_data
+            icons_list = (
+                si_data.get('icons', [])
+                if isinstance(si_data, dict)
+                else si_data
+            )
             if isinstance(icons_list, list) and icons_list:
                 for item in icons_list:
-                    slug = re.sub(r'[^a-z0-9]', '', item.get('title', '').lower())
+                    slug = re.sub(
+                        r'[^a-z0-9]', '', item.get('title', '').lower()
+                    )
                     hex_color = item.get('hex', '')
                     if slug and hex_color:
                         colors[slug] = _boost_dark_color(hex_color)
@@ -89,6 +115,8 @@ def collect_topics_map(username: str) -> dict[str, list[str]]:
                 continue
             for topic in repo.get('topics', []):
                 topic_repos[topic].append(repo_name)
-    sorted_items = sorted(topic_repos.items(), key=lambda item: (-len(item), item))
+    sorted_items = sorted(
+        topic_repos.items(), key=lambda item: (-len(item), item)
+    )
     logger.info('Collected %d unique topics.', len(sorted_items))
     return dict(sorted_items)

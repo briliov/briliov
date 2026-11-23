@@ -26,14 +26,18 @@ def colorize_svg(svg_bytes: bytes, hex_color: str) -> str:
             stroke_val = elem.attrib.get('stroke', '').lower()
             if stroke_val and stroke_val not in ('none', 'transparent'):
                 elem.set('stroke', hex_color)
-        encoded = base64.b64encode(ET.tostring(root, encoding='utf-8')).decode('ascii')
+        encoded = base64.b64encode(ET.tostring(root, encoding='utf-8')).decode(
+            'ascii'
+        )
         return f'data:image/svg+xml;base64,{encoded}'
     except ET.ParseError:
         encoded = base64.b64encode(svg_bytes).decode('ascii')
         return f'data:image/svg+xml;base64,{encoded}'
 
 
-def create_svg_badge(topic: str, icon_data: str, display_label: str | None = None) -> Path:
+def create_svg_badge(
+    topic: str, icon_data: str, display_label: str | None = None
+) -> Path:
     label = (display_label or topic.replace('-', ' ')).upper()
     char_width = 9.2
     text_width = int(len(label) * char_width)
