@@ -35,7 +35,11 @@ TAG_TO_GROUP = (
     ('hosting', 'DevOps & Cloud'),
     ('shell', 'DevOps & Cloud'),
     ('terminal', 'DevOps & Cloud'),
+    ('docker', 'DevOps & Cloud'),
     ('python', 'Backend & Core'),
+    ('django', 'Backend & Core'),
+    ('pydantic', 'Backend & Core'),
+    ('http', 'Backend & Core'),
     ('backend', 'Backend & Core'),
     ('framework', 'Backend & Core'),
     ('runtime', 'Backend & Core'),
@@ -81,7 +85,7 @@ def _boost_dark_color(hex_str: str) -> str:
 def _detect_category(name: str, tags: list[str]) -> str:
     lowered = {t.lower() for t in tags} | {name.lower()}
     for keyword, group in TAG_TO_GROUP:
-        if any(keyword in item for item in lowered):
+        if keyword in lowered or keyword in name.lower():
             return group
     return 'Testing & Tools'
 
