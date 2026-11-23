@@ -26,30 +26,28 @@ def colorize_svg(svg_bytes: bytes, hex_color: str) -> str:
             stroke_val = elem.attrib.get('stroke', '').lower()
             if stroke_val and stroke_val not in ('none', 'transparent'):
                 elem.set('stroke', hex_color)
-        encoded = base64.b64encode(ET.tostring(root, encoding='utf-8')).decode(
-            'ascii'
-        )
+        encoded = base64.b64encode(ET.tostring(root, encoding='utf-8')).decode('ascii')
         return f'data:image/svg+xml;base64,{encoded}'
     except ET.ParseError:
         encoded = base64.b64encode(svg_bytes).decode('ascii')
         return f'data:image/svg+xml;base64,{encoded}'
 
 
-def create_svg_badge(topic: str, icon_data: str) -> Path:
-    label = topic.upper().replace('-', ' ')
-    char_width = 8.4
+def create_svg_badge(topic: str, icon_data: str, display_label: str | None = None) -> Path:
+    label = (display_label or topic.replace('-', ' ')).upper()
+    char_width = 9.2
     text_width = int(len(label) * char_width)
-    icon_offset = 24
-    total_width = text_width + icon_offset + 26
+    icon_offset = 25
+    total_width = text_width + icon_offset + 28
     text_x = (13 + icon_offset) + (text_width / 2)
     svg_ns = 'http://www.' + 'w3.org/2000/svg'
     lines = [
-        f'<svg xmlns="{svg_ns}" width="{total_width}" height="28" role="img" aria-label="{label}">',
-        f'  <rect width="{total_width}" height="28" fill="#000000" />',
-        f'  <image x="12" y="7" width="14" height="14" href="{icon_data}" />',
-        f'  <text x="{text_x:.1f}" y="17.5" fill="#ffffff" '
+        f'<svg xmlns="{svg_ns}" width="{total_width}" height="30" role="img" aria-label="{label}">',
+        f'  <rect width="{total_width}" height="30" fill="#000000" />',
+        f'  <image x="12" y="7.5" width="15" height="15" href="{icon_data}" />',
+        f'  <text x="{text_x:.1f}" y="19" fill="#ffffff" '
         f'font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" '
-        f'font-size="10" font-weight="600" text-anchor="middle" letter-spacing="1.5">{label}</text>',
+        f'font-size="11" font-weight="800" text-anchor="middle" letter-spacing="1.5">{label}</text>',
         '</svg>',
     ]
     badge_path = BADGES_DIR / f'{topic}.svg'

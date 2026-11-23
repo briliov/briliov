@@ -4,8 +4,10 @@ import os
 from pathlib import Path
 
 TOKEN = os.getenv('GITHUB_TOKEN')
+
 REPO_ROOT = Path.cwd()
 README_PATH = REPO_ROOT / 'README.md'
+CONFIG_PATH = REPO_ROOT / 'stack_config.yml'
 BADGES_DIR = REPO_ROOT / 'assets' / 'badges'
 CUSTOM_ICONS_DIR = REPO_ROOT / 'assets' / 'custom_icons'
 
@@ -15,29 +17,9 @@ ICON_SIZE = (16, 16)
 
 GITHUB_WEB_URL = '.'.join(('https://github', 'com'))
 GITHUB_API_URL = '.'.join(('https://api', 'github', 'com'))
-EXPLORE_RAW_URL = '.'.join(
-    ('https://raw', 'githubusercontent', 'com/github/explore/main/topics')
-)
-DEVICON_CDN_URL = '.'.join(
-    ('https://raw', 'githubusercontent', 'com/devicons/devicon/master/icons')
-)
-DEVICON_META_URL = '.'.join(
-    (
-        'https://raw',
-        'githubusercontent',
-        'com/devicons/devicon/master/devicon.json',
-    )
-)
-SIMPLE_ICONS_URL = '.'.join(
-    (
-        'https://raw',
-        'githubusercontent',
-        'com/simple-icons/simple-icons/develop/icons',
-    )
-)
+EXPLORE_RAW_URL = '.'.join(('https://raw', 'githubusercontent', 'com/github/explore/main/topics'))
+DEVICON_CDN_URL = '.'.join(('https://raw', 'githubusercontent', 'com/devicons/devicon/master/icons'))
+DEVICON_META_URL = '.'.join(('https://raw', 'githubusercontent', 'com/devicons/devicon/master/devicon.json'))
+SIMPLE_ICONS_URL = '.'.join(('https://raw', 'githubusercontent', 'com/simple-icons/simple-icons/develop/icons'))
 
-PROVIDER_ORDER = ('Custom', 'SimpleIcons', 'Devicon', 'Explore')
-
-LINGUIST_URL = '.'.join(
-    ('https://raw', 'githubusercontent', 'com/github-linguist/linguist/main/lib/linguist/languages.yml')
-)
+PROVIDER_ORDER = ('Custom', 'Devicon', 'SimpleIcons', 'Explore')
