@@ -7,7 +7,7 @@ import urllib.parse
 from profile_sync.config import BADGES_DIR, GITHUB_WEB_URL
 from profile_sync.github_client import (
     collect_topics_map,
-    fetch_devicon_colors,
+    fetch_brand_colors,
     get_username,
 )
 from profile_sync.providers import build_pipeline, resolve_icon_info
@@ -65,7 +65,7 @@ def process_badges(
 
 def main() -> None:
     username = get_username()
-    brand_colors = fetch_devicon_colors()
+    brand_colors = fetch_brand_colors()
     topic_repos = collect_topics_map(username)
     badges_html = process_badges(topic_repos, username, brand_colors)
     update_readme(badges_html)
