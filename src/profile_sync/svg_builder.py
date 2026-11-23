@@ -26,18 +26,14 @@ def colorize_svg(svg_bytes: bytes, hex_color: str) -> str:
             stroke_val = elem.attrib.get('stroke', '').lower()
             if stroke_val and stroke_val not in ('none', 'transparent'):
                 elem.set('stroke', hex_color)
-        encoded = base64.b64encode(ET.tostring(root, encoding='utf-8')).decode(
-            'ascii'
-        )
+        encoded = base64.b64encode(ET.tostring(root, encoding='utf-8')).decode('ascii')
         return f'data:image/svg+xml;base64,{encoded}'
     except ET.ParseError:
         encoded = base64.b64encode(svg_bytes).decode('ascii')
         return f'data:image/svg+xml;base64,{encoded}'
 
 
-def create_svg_badge(
-    topic: str, icon_data: str, display_label: str | None = None
-) -> Path:
+def create_svg_badge(topic: str, icon_data: str, display_label: str | None = None) -> Path:
     label = (display_label or topic.replace('-', ' ')).upper()
     char_width = 9.2
     text_width = int(len(label) * char_width)
@@ -47,9 +43,9 @@ def create_svg_badge(
     svg_ns = 'http://www.' + 'w3.org/2000/svg'
     lines = [
         f'<svg xmlns="{svg_ns}" width="{total_width}" height="30" role="img" aria-label="{label}">',
-        f'  <rect width="{total_width}" height="30" fill="#000000" />',
+        f'  <rect x="0.5" y="0.5" width="{total_width - 1}" height="29" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1" />',
         f'  <image x="12" y="7.5" width="15" height="15" href="{icon_data}" />',
-        f'  <text x="{text_x:.1f}" y="19" fill="#ffffff" '
+        f'  <text x="{text_x:.1f}" y="19" fill="#f0f6fc" '
         f'font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" '
         f'font-size="11" font-weight="800" text-anchor="middle" letter-spacing="1.5">{label}</text>',
         '</svg>',
