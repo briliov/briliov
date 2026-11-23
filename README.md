@@ -1,6 +1,7 @@
 <p align="center">
-  <img width="766" height="83" alt="image" src="https://github.com/user-attachments/assets/40b7cd8d-ccbc-4f0d-9696-fe668fb3fd07" />
+  <img src="https://raw.githubusercontent.com/briliov/gh-readme-hub/refs/heads/master/assets/banner/banner.svg" alt="BRILIOV" />
 </p>
+
 
 ## Hi there, my name is [Egor](https://github.com/briliov) ✦
 **STATUS:** \
