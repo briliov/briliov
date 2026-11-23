@@ -48,6 +48,7 @@
   <a href="https://github.com/briliov?tab=repositories&topic=git"><img src="assets/badges/git.svg" alt="GIT" vspace="4" hspace="3"></a>
   <a href="https://github.com/briliov?tab=repositories&topic=telegram"><img src="assets/badges/telegram.svg" alt="TELEGRAM" vspace="4" hspace="3"></a>
   <a href="https://github.com/briliov?tab=repositories&topic=vk"><img src="assets/badges/vk.svg" alt="VK" vspace="4" hspace="3"></a>
+  <a href="https://github.com/briliov?tab=repositories&topic=react"><img src="assets/badges/react.svg" alt="REACT" vspace="4" hspace="3"></a>
 <!-- TECH_STACK:END -->
 
 </p>
