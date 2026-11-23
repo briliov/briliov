@@ -16,8 +16,8 @@ END_MARKER = '<!-- TECH_STACK:END -->'
 ICON_SIZE = (16, 16)
 
 GITHUB_WEB_URL = 'https://github.com'
-GITHUB_API_URL = 'https://github.com'
-RAW_GITHUB_URL = 'https://githubusercontent.com'
+GITHUB_API_URL = 'https://api.github.com'
+RAW_GITHUB_URL = 'https://raw.githubusercontent.com'
 
 EXPLORE_RAW_URL = f'{RAW_GITHUB_URL}/github/explore/main/topics'
 DEVICON_CDN_URL = f'{RAW_GITHUB_URL}/devicons/devicon/master/icons'
