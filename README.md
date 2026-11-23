@@ -1,4 +1,6 @@
-![BRILIOV](src/banner.svg)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/egorbriliov/gh-readme-hub/master/assets/banner/banner.svg" alt="BRILIOV" />
+</p>
 
 ## Hi there, my name is [Egor](https://github.com/briliov) ✦
 **STATUS:** \
