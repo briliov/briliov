@@ -37,3 +37,7 @@ SIMPLE_ICONS_URL = '.'.join(
 )
 
 PROVIDER_ORDER = ('Custom', 'SimpleIcons', 'Devicon', 'Explore')
+
+LINGUIST_URL = '.'.join(
+    ('https://raw', 'githubusercontent', 'com/github-linguist/linguist/main/lib/linguist/languages.yml')
+)

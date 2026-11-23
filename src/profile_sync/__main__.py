@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import defaultdict
 import logging
 import shutil
 import urllib.parse
@@ -13,19 +14,29 @@ from profile_sync.svg_builder import create_svg_badge
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s', datefmt='%H:%M:%S')
 logger = logging.getLogger(__name__)
 
+GROUP_ORDER = (
+    'Languages & Core',
+    'Frontend & Markup',
+    'Databases',
+    'DevOps & Shell',
+    'Ecosystem & Tools',
+)
+
 
 def process_badges(
     topic_repos: dict[str, list[str]],
     username: str,
     brand_colors: dict[str, str],
+    linguist_categories: dict[str, str],
 ) -> str:
+    """Rebuild badges grouped by GitHub Linguist taxonomy."""
     if BADGES_DIR.exists():
         shutil.rmtree(BADGES_DIR)
         logger.info('Cleaned badges directory: %s', BADGES_DIR)
     BADGES_DIR.mkdir(parents=True, exist_ok=True)
 
     pipeline = build_pipeline()
-    html_lines: list[str] = []
+    grouped_html: dict[str, list[str]] = defaultdict(list)
     matched_records: list[dict] = []
     missing_icons: dict[str, list[str]] = {}
     total = len(topic_repos)
@@ -38,9 +49,12 @@ def process_badges(
             continue
 
         create_svg_badge(topic, icon_res.data_uri)
+        clean_name = topic.replace('-', '')
+        category = linguist_categories.get(clean_name, 'Ecosystem & Tools')
+
         logger.info(
-            '[%d/%d] %-22s -> OK | %s | color=%s',
-            idx, total, topic, icon_res.provider, icon_res.color,
+            '[%d/%d] %-22s -> OK | %s | group=%s',
+            idx, total, topic, icon_res.provider, category,
         )
         matched_records.append(
             {
@@ -54,19 +68,26 @@ def process_badges(
         label = topic.upper().replace('-', ' ')
         rel_path = f'assets/badges/{topic}.svg'
         filter_url = f'{GITHUB_WEB_URL}/{username}?tab=repositories&topic={urllib.parse.quote(topic)}'
-        html_lines.append(
+        grouped_html[category].append(
             f'  <a href="{filter_url}"><img src="{rel_path}" alt="{label}" vspace="3" hspace="2" /></a>'
         )
 
     print_console_report(username, matched_records, missing_icons)
-    return '\n'.join(html_lines)
+
+    blocks = []
+    for group in GROUP_ORDER:
+        items = grouped_html.get(group)
+        if items:
+            blocks.append('\n'.join(items))
+    return '\n<br>\n'.join(blocks)
 
 
 def main() -> None:
+    """Collect repository topics, rebuild badges, and update README."""
     username = get_username()
-    brand_colors, _ = fetch_metadata()
+    brand_colors, linguist_categories = fetch_metadata()
     topic_repos = collect_topics_map(username)
-    badges_html = process_badges(topic_repos, username, brand_colors)
+    badges_html = process_badges(topic_repos, username, brand_colors, linguist_categories)
     update_readme(badges_html)
 
 

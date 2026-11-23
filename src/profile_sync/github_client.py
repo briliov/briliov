@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections import Counter, defaultdict
+from collections import defaultdict
 import colorsys
 import json
 import logging
@@ -8,7 +8,9 @@ import os
 import re
 import urllib.request
 
-from profile_sync.config import DEVICON_META_URL, GITHUB_API_URL, REPO_ROOT, TOKEN
+import yaml
+
+from profile_sync.config import DEVICON_META_URL, GITHUB_API_URL, LINGUIST_URL, REPO_ROOT, TOKEN
 
 logger = logging.getLogger(__name__)
 SIMPLE_ICONS_META_URLS = (
@@ -16,26 +18,15 @@ SIMPLE_ICONS_META_URLS = (
     '.'.join(('https://raw', 'githubusercontent', 'com/simple-icons/simple-icons/develop/_data/simple-icons.json')),
 )
 
-CORE_META_MAP = {
-    'database': 'Databases',
-    'frontend': 'Frontend',
-    'css': 'Frontend',
-    'devops': 'DevOps & Cloud',
-    'cloud': 'DevOps & Cloud',
-    'container': 'DevOps & Cloud',
-    'server': 'DevOps & Cloud',
-    'backend': 'Backend & Core',
-    'framework': 'Backend & Core',
-    'language': 'Backend & Core',
-}
-
 
 def get_username() -> str:
+    """Resolve GitHub username from environment or repository root name."""
     owner = os.getenv('GITHUB_REPOSITORY_OWNER')
     return owner if owner else REPO_ROOT.name
 
 
 def github_get(url: str) -> list | dict:
+    """Send an authenticated GET request to the GitHub REST API."""
     headers = {'Accept': 'application/vnd.github+json', 'User-Agent': 'Profile-Stack-Sync'}
     if TOKEN:
         headers['Authorization'] = f'Bearer {TOKEN}'
@@ -45,6 +36,7 @@ def github_get(url: str) -> list | dict:
 
 
 def _boost_dark_color(hex_str: str) -> str:
+    """Lift lightness in HSL if color is too dark for a black background."""
     clean_hex = hex_str.lstrip('#')
     if len(clean_hex) != 6:
         return '#ffffff'
@@ -61,9 +53,49 @@ def _boost_dark_color(hex_str: str) -> str:
     return f'#{int(nr * 255):02x}{int(ng * 255):02x}{int(nb * 255):02x}'
 
 
+def fetch_linguist_categories() -> dict[str, str]:
+    """Classify languages and aliases using GitHub Linguist taxonomy."""
+    categories: dict[str, str] = {}
+    try:
+        with urllib.request.urlopen(LINGUIST_URL, timeout=20) as response:
+            data = yaml.safe_load(response.read().decode('utf-8'))
+    except Exception as exc:
+        logger.warning('Could not fetch Linguist languages.yml: %s', exc)
+        return categories
+
+    if not isinstance(data, dict):
+        return categories
+
+    for lang_name, meta in data.items():
+        if not isinstance(meta, dict):
+            continue
+        lang_type = meta.get('type', '')
+        lang_group = meta.get('group', '')
+
+        if lang_name.lower() in ('sql', 'plpgsql', 'tsql'):
+            category = 'Databases'
+        elif lang_group == 'Shell' or lang_name.lower() == 'dockerfile':
+            category = 'DevOps & Shell'
+        elif lang_type == 'markup':
+            category = 'Frontend & Markup'
+        elif lang_type == 'programming':
+            category = 'Languages & Core'
+        else:
+            continue
+
+        keys = [lang_name] + meta.get('aliases', [])
+        for key in keys:
+            slug = re.sub(r'[^a-z0-9]', '', str(key).lower())
+            if slug:
+                categories[slug] = category
+
+    logger.info('Loaded %d language rules from GitHub Linguist.', len(categories))
+    return categories
+
+
 def fetch_metadata() -> tuple[dict[str, str], dict[str, str]]:
+    """Fetch brand colors and GitHub Linguist categories."""
     colors: dict[str, str] = {}
-    base_categories: dict[str, str] = {}
 
     for meta_url in SIMPLE_ICONS_META_URLS:
         try:
@@ -85,50 +117,17 @@ def fetch_metadata() -> tuple[dict[str, str], dict[str, str]]:
             for item in dev_data:
                 name = item.get('name', '')
                 hex_color = item.get('color', '')
-                tags = {t.lower() for t in item.get('tags', []) if isinstance(t, str)}
-                if name:
-                    if hex_color:
-                        colors[name] = _boost_dark_color(hex_color)
-                    for tag, group in CORE_META_MAP.items():
-                        if tag in tags:
-                            base_categories[name] = group
-                            break
+                if name and hex_color:
+                    colors[name] = _boost_dark_color(hex_color)
     except Exception as exc:
-        logger.warning('Could not fetch devicon.json metadata: %s', exc)
+        logger.warning('Could not fetch devicon.json colors: %s', exc)
 
-    return colors, base_categories
-
-
-def infer_categories_from_context(
-    topic_repos: dict[str, list[str]],
-    base_categories: dict[str, str],
-) -> dict[str, str]:
-    """Infer missing categories from co-occurring topics inside repositories."""
-    repo_topics: dict[str, list[str]] = defaultdict(list)
-    for topic, repos in topic_repos.items():
-        for repo in repos:
-            repo_topics[repo].append(topic)
-
-    resolved: dict[str, str] = {}
-    for topic, repos in topic_repos.items():
-        clean = topic.replace('-', '')
-        if clean in base_categories:
-            resolved[clean] = base_categories[clean]
-            continue
-
-        votes: Counter[str] = Counter()
-        for repo in repos:
-            for neighbor in repo_topics[repo]:
-                n_clean = neighbor.replace('-', '')
-                if n_clean in base_categories:
-                    votes[base_categories[n_clean]] += 1
-
-        resolved[clean] = votes.most_common(1)[0][0] if votes else 'Testing & Tools'
-
-    return resolved
+    categories = fetch_linguist_categories()
+    return colors, categories
 
 
 def collect_topics_map(username: str) -> dict[str, list[str]]:
+    """Collect public repository topics sorted by usage frequency."""
     logger.info('Fetching repositories for user: %s', username)
     repos = github_get(f'{GITHUB_API_URL}/users/{username}/repos?per_page=100')
     topic_repos: dict[str, list[str]] = defaultdict(list)
@@ -139,6 +138,6 @@ def collect_topics_map(username: str) -> dict[str, list[str]]:
                 continue
             for topic in repo.get('topics', []):
                 topic_repos[topic].append(repo_name)
-    sorted_items = sorted(topic_repos.items(), key=lambda item: (-len(item[1]), item[0]))
+    sorted_items = sorted(topic_repos.items(), key=lambda item: (-len(item), item))
     logger.info('Collected %d unique topics.', len(sorted_items))
     return dict(sorted_items)
