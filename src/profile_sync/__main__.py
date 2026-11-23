@@ -116,7 +116,7 @@ def main() -> None:
     profile_html = format_grouped_html(list(topic_repos.keys()), valid_topics, username, groups, base_asset_prefix='')
     update_readme(profile_html)
 
-    raw_prefix = f'https://github.com{username}/{username}/raw/HEAD/'
+    raw_prefix = f'https://://github.com{username}/{username}/raw/HEAD/'
     for repo_name, topics in sorted(repo_topics.items()):
         repo_html = format_grouped_html(topics, valid_topics, username, groups, base_asset_prefix=raw_prefix)
         if repo_html:
