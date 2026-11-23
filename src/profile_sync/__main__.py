@@ -12,6 +12,7 @@ from profile_sync.config import (
     CONFIG_PATH,
     END_MARKER,
     GITHUB_WEB_URL,
+    RAW_GITHUB_URL,
     START_MARKER,
 )
 from profile_sync.github_client import (
@@ -143,7 +144,7 @@ def main() -> None:
     )
     update_readme(profile_html)
 
-    raw_prefix = f'https://://github.com//{username}/raw/HEAD/'
+    raw_prefix = f'{RAW_GITHUB_URL}/{username}/{username}/main/'
     for repo_name, topics in sorted(repo_topics.items()):
         repo_html = format_grouped_html(
             topics,
