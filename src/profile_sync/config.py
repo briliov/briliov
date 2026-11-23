@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 TOKEN = os.getenv('GITHUB_TOKEN')
-REPO_ROOT = Path.cwd()[2]
+REPO_ROOT = Path.cwd()
 README_PATH = REPO_ROOT / 'README.md'
 BADGES_DIR = REPO_ROOT / 'assets' / 'badges'
 CUSTOM_ICONS_DIR = REPO_ROOT / 'assets' / 'custom_icons'
